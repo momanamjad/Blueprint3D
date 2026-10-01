@@ -1,4 +1,4 @@
-# blueprint3d-babylon
+# blueprint3d
 
 [![Engine](https://img.shields.io/badge/Engine-Babylon.js%20%3E%3D%207.11.0-orange?style=flat-square)](https://github.com/BabylonJS/Babylon.js)
 [![Vite](https://img.shields.io/badge/Build-Vite%20%3E%3D%205.0.0-blue?style=flat-square)](https://vitejs.dev/)
