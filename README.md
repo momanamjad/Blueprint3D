@@ -18,7 +18,7 @@
 ## 🔗 Live Demo & Local Setup
 
 ### 🚀 Live Demo
-*   **Live Demo URL**: [https://Sunflower613.github.io/blueprint3d-babylon/](https://Sunflower613.github.io/blueprint3d-babylon/)
+*   **Live Demo URL**:currently unavailable
 *   *Provides full feature demonstrations including 2D drag-and-drop, 3D navigation, appliance toggle controls, material eyedropper & section painting, CAD/3MF drawing exports, and more.*
 
 ### 💻 Local Quickstart
