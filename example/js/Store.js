@@ -204,14 +204,14 @@ export class Store extends EventEmitter {
       this.emit('saved');
       return true;
     } catch (error) {
-      console.error('Save Item localStorage  Item:', error);
+      console.error('Save project to localStorage failed:', error);
       this.emit('saveError', error);
       return false;
     }
   }
 
   /**
-   *   localStorage  
+   * Load project from localStorage
    * @returns {{ buildingData: object|null, materialLibrary: any[]|null, uiState: object|null }}
    */
   loadFromLocal() {
@@ -226,23 +226,23 @@ export class Store extends EventEmitter {
         uiState: rawUI ? JSON.parse(rawUI) : null,
       };
     } catch (error) {
-      console.error(' Item localStorage  Item:', error);
+      console.error('Load project from localStorage failed:', error);
       return { buildingData: null, materialLibrary: null, uiState: null };
     }
   }
 
-  /**   localStorage  Save  */
+  /** Check if localStorage save exists */
   hasLocalSave() {
     return localStorage.getItem(STORAGE_KEY_BUILDING) !== null;
   }
 
-  /**  Save  */
+  /** Get last save timestamp */
   getLastSaveTime() {
     const ts = localStorage.getItem(STORAGE_KEY_SAVE_TS);
     return ts ? Number(ts) : null;
   }
 
-  /**   localStorage  Save  */
+  /** Clear localStorage save data */
   clearLocal() {
     try {
       localStorage.removeItem(STORAGE_KEY_BUILDING);
@@ -250,7 +250,7 @@ export class Store extends EventEmitter {
       localStorage.removeItem(STORAGE_KEY_UI_STATE);
       localStorage.removeItem(STORAGE_KEY_SAVE_TS);
     } catch (error) {
-      console.error(' Item localStorage  Item:', error);
+      console.error('Clear project from localStorage failed:', error);
     }
   }
 
@@ -399,14 +399,14 @@ export class Store extends EventEmitter {
       this.emit('saved');
       return true;
     } catch (error) {
-      console.error('Save Item:', error);
+      console.error('Save project failed:', error);
       this.emit('saveError', error);
       return false;
     }
   }
 
   /**
-   *  
+   * Load project
    * @param {string} name
    * @returns {{ buildingData: object|null, materialLibrary: any[]|null, uiState: object|null, name: string }|null}
    */
@@ -420,13 +420,13 @@ export class Store extends EventEmitter {
       localStorage.setItem(STORAGE_KEY_CURRENT_PROJECT, this.currentProjectName);
       return data;
     } catch (error) {
-      console.error(' Item:', error);
+      console.error('Load project failed:', error);
       return null;
     }
   }
 
   /**
-   * Delete 
+   * Delete project
    * @param {string} name
    */
   deleteProject(name) {
@@ -436,7 +436,7 @@ export class Store extends EventEmitter {
       const index = this.listProjects().filter((p) => p.id !== id);
       this._saveProjectIndex(index);
     } catch (error) {
-      console.error('Delete Item:', error);
+      console.error('Delete project failed:', error);
     }
   }
 

@@ -46,7 +46,7 @@ export function saveCustomColorMaterial(descriptor) {
     }
     localStorage.setItem(CUSTOM_COLOR_STORAGE_KEY, JSON.stringify(stored));
   } catch (e) {
-    console.error('SaveCustom Item localStorage  Item:', e);
+    console.error('Save custom color material to localStorage failed:', e);
   }
 }
 
@@ -56,7 +56,7 @@ export function removeCustomColorMaterial(id) {
     const filtered = stored.filter((m) => m.id !== id);
     localStorage.setItem(CUSTOM_COLOR_STORAGE_KEY, JSON.stringify(filtered));
   } catch (e) {
-    console.error(' Item localStorage  ItemCustom Item:', e);
+    console.error('Remove custom color material from localStorage failed:', e);
   }
 }
 
@@ -72,22 +72,22 @@ export function setCustomColorMaterials(materials) {
   try {
     localStorage.setItem(CUSTOM_COLOR_STORAGE_KEY, JSON.stringify(materials));
   } catch (e) {
-    console.error('SaveCustom Item localStorage  Item:', e);
+    console.error('Set custom color materials failed:', e);
   }
 }
 
 const COLOR_PICKER_CATEGORIES = ['paint', 'emissive', 'glass', 'metal', 'mirror'];
 
-/**   ID  Select Custom  */
+/** Check if ID belongs to custom color material */
 export function isCustomColorMaterial(id) {
   if (typeof id !== 'string') return false;
   return COLOR_PICKER_CATEGORIES.some((cat) => id.startsWith(`custom-${cat}-`));
 }
 
 export function getActiveMaterialDisplayName(mat) {
-  if (!mat) return ' ItemSelect Item';
+  if (!mat) return 'No material selected';
   if (typeof mat === 'string') {
-    if (mat.startsWith('#')) return ` Item：${mat}`;
+    if (mat.startsWith('#')) return `Color: ${mat}`;
     return mat;
   }
   
@@ -98,21 +98,21 @@ export function getActiveMaterialDisplayName(mat) {
   
   if (isPureColor) {
     const colorVal = mat.color || '#ffffff';
-    if (!mat.name || mat.name === ' Item' || mat.name === 'Custom Item' || mat.name.startsWith('Pick Material Item')) {
-      return ` Item：${colorVal}`;
+    if (!mat.name || mat.name === 'No material selected' || mat.name === 'Custom Material' || mat.name.startsWith('Pick Material')) {
+      return `Color: ${colorVal}`;
     }
   }
-  return mat.name || 'Custom Item';
+  return mat.name || 'Custom Material';
 }
 
 export function getActiveMaterialArrayDisplayName(matArray) {
-  if (!matArray || matArray.length === 0) return ' ItemSelect Item';
+  if (!matArray || matArray.length === 0) return 'No material selected';
   const names = matArray.map(item => {
     const mat = item.material || item;
     return getActiveMaterialDisplayName(mat);
   });
   const uniqueNames = [...new Set(names)];
-  return uniqueNames.join('、');
+  return uniqueNames.join(', ');
 }
 
 
@@ -214,7 +214,7 @@ function upsertMaterialDescriptor(descriptor) {
 }
 
 function getBaseMaterialName(name) {
-  if (!name) return ' Item';
+  if (!name) return 'Unknown Material';
   return name.replace(/(\s*\((?:Tintable|#[0-9a-fA-F]{3,8})\))+$/gi, '').trim();
 }
 
@@ -225,7 +225,7 @@ function createTintedTextureDescriptor(material, color) {
     ? sourceId
     : `derived_texture_${sourceId.replace(/[^a-zA-Z0-9_-]/g, '_')}`;
 
-  const baseName = getBaseMaterialName(material.name || (isCustomSource ? 'Custom Item' : ' Item'));
+  const baseName = getBaseMaterialName(material.name || (isCustomSource ? 'Custom Material' : 'Default Material'));
   const name = color ? `${baseName} (${color})` : baseName;
 
   return {
@@ -260,7 +260,7 @@ export function renderMaterialLibrary(isSwitchingCategory = false) {
 
   const header = document.createElement('div');
   header.className = 'material-library-header';
-  let activeName = ' ItemSelect Item';
+  let activeName = 'No material selected';
   if (editor.activeMaterialArray && editor.activeMaterialArray.length > 0) {
     activeName = getActiveMaterialArrayDisplayName(editor.activeMaterialArray);
   } else if (editor.activeMaterialDescriptor) {
@@ -269,22 +269,21 @@ export function renderMaterialLibrary(isSwitchingCategory = false) {
    const grid = document.createElement('div');
   grid.className = 'material-grid';
 
-  // Paint、Emissive、Glass、Metal Mirror ： Select （ ）
   if (COLOR_PICKER_CATEGORIES.includes(category)) {
     const colorPickerControl = document.createElement('div');
     colorPickerControl.className = 'material-swatch upload-swatch';
     colorPickerControl.style.position = 'relative';
     const categoryTitles = {
-      paint: 'CustomPaint Item',
-      emissive: 'CustomEmissive Item',
-      glass: 'CustomGlass Item',
-      metal: 'CustomMetal Item',
-      mirror: 'CustomMirror Item'
+      paint: 'Custom Paint',
+      emissive: 'Custom Emissive',
+      glass: 'Custom Glass',
+      metal: 'Custom Metal',
+      mirror: 'Custom Mirror'
     };
-    const pickerTitle = categoryTitles[category] || 'Custom Item';
+    const pickerTitle = categoryTitles[category] || 'Custom Material';
     colorPickerControl.title = pickerTitle;
     colorPickerControl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>`;
-    //  ，  iPad Safari  。
+    
     const colorInput = document.createElement('input');
     colorInput.type = 'color';
     colorInput.value = '#ffffff';
@@ -298,13 +297,13 @@ export function renderMaterialLibrary(isSwitchingCategory = false) {
       const prefix = `custom-${category}`;
       const kind = category;
       const namePrefixes = {
-        paint: 'CustomPaint',
-        emissive: 'CustomEmissive',
-        glass: 'CustomGlass',
-        metal: 'CustomMetal',
-        mirror: 'CustomMirror'
+        paint: 'Custom Paint',
+        emissive: 'Custom Emissive',
+        glass: 'Custom Glass',
+        metal: 'Custom Metal',
+        mirror: 'Custom Mirror'
       };
-      const namePrefix = namePrefixes[category] || 'Custom Item';
+      const namePrefix = namePrefixes[category] || 'Custom Material';
       const descriptor = {
         id: `${prefix}-${hex}`,
         name: `${namePrefix} (${color})`,
@@ -312,7 +311,7 @@ export function renderMaterialLibrary(isSwitchingCategory = false) {
         kind,
         color
       };
-      //  
+      
       if (!editor.materialLibrary.some((m) => m.id === descriptor.id)) {
         editor.materialLibrary = [descriptor, ...editor.materialLibrary];
       }
@@ -324,11 +323,10 @@ export function renderMaterialLibrary(isSwitchingCategory = false) {
     });
     grid.appendChild(colorPickerControl);
   } else {
-    //  
     const uploadButton = document.createElement('button');
     uploadButton.type = 'button';
     uploadButton.className = 'material-swatch upload-swatch';
-    uploadButton.title = ' ItemCustom Item';
+    uploadButton.title = 'Upload Custom Material';
     uploadButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>`;
     uploadButton.addEventListener('click', () => {
       document.getElementById('material-upload').click();
@@ -344,7 +342,7 @@ export function renderMaterialLibrary(isSwitchingCategory = false) {
     applySwatchStyle(button, material);
     button.addEventListener('click', () => {
       editor.activeMaterialDescriptor = material;
-      editor.activeMaterialArray = null; //  
+      editor.activeMaterialArray = null;
       renderMaterialLibrary();
       ctx.updateEditor();
     });
@@ -365,18 +363,15 @@ export function renderMaterialLibrary(isSwitchingCategory = false) {
     textWrapper.style.cssText = 'display: flex; flex-direction: column; gap: 2px;';
 
     const label = document.createElement('span');
-    label.textContent = ' Item';
+    label.textContent = 'Texture Tint';
     label.style.cssText = 'font-size: 13px; font-weight: 500; color: #172033;';
 
     const hint = document.createElement('span');
-    // hint.textContent = ' ， ';
-    // hint.style.cssText = 'font-size: 11px; color: #66758f;';
 
     const picker = document.createElement('input');
     picker.type = 'color';
     picker.value = activeTextureMaterial.color || '#ffffff';
     picker.style.cssText = 'border: none;background: none; width: 44px; height: 28px; cursor: pointer; padding: 0; overflow: hidden;';
-    // picker.style.cssText = 'border: 1px solid rgba(42, 65, 92, 0.16); background: none; width: 44px; height: 28px; cursor: pointer; padding: 0; border-radius: 4px; overflow: hidden;';
 
     picker.addEventListener('change', (event) => {
       const tintedDescriptor = createTintedTextureDescriptor(activeTextureMaterial, event.target.value);
@@ -392,19 +387,17 @@ export function renderMaterialLibrary(isSwitchingCategory = false) {
     materialLibraryPanel.appendChild(tintPanel);
   }
 
-  //  Custom ， Delete 
   const activeId = editor.activeMaterialDescriptor?.id ? String(editor.activeMaterialDescriptor.id) : '';
   const isUploadedCustom = activeId.startsWith('custom_') && category === 'custom';
   const isColorCustom = isCustomColorMaterial(activeId) && COLOR_PICKER_CATEGORIES.includes(category);
   if (isUploadedCustom || isColorCustom) {
-    //  Custom 
     if (isUploadedCustom) {
       const fieldLabel = document.createElement('label');
       fieldLabel.className = 'field';
       fieldLabel.style.marginTop = '12px';
 
       const span = document.createElement('span');
-      span.textContent = ' Item';
+      span.textContent = 'Custom Name';
 
       const input = document.createElement('input');
       input.type = 'text';
@@ -434,10 +427,10 @@ export function renderMaterialLibrary(isSwitchingCategory = false) {
     const deleteBtn = document.createElement('button');
     deleteBtn.type = 'button';
     deleteBtn.className = 'danger';
-    deleteBtn.textContent = 'Delete Item';
+    deleteBtn.textContent = 'Delete Custom Material';
     deleteBtn.style.width = '100%';
     deleteBtn.addEventListener('click', async () => {
-      const confirmDelete = await ctx.showCustomConfirm('Delete Item', ` ItemDeleteCustom Item「${editor.activeMaterialDescriptor.name}」 Item？`);
+      const confirmDelete = await ctx.showCustomConfirm('Delete Material', `Are you sure you want to delete custom material "${editor.activeMaterialDescriptor.name}"?`);
       if (confirmDelete) {
         if (isUploadedCustom) {
           removeCustomMaterialFromLocalStorage(editor.activeMaterialDescriptor.id);
@@ -892,7 +885,7 @@ export function extractMaterial(target, precise = true) {
       editor.activeMaterialDescriptor = tryUpdateToFullMaterial(pickedMaterial || pickedColor);
       editor.activeMaterialArray = null; //  
       const displayName = getActiveMaterialDisplayName(editor.activeMaterialDescriptor);
-      ctx.showToast(` ItemPick Material Item: ${displayName}`);
+      ctx.showToast(`Picked Material: ${displayName}`);
 
       //  
       const catSelect = document.getElementById('material-category');
@@ -908,7 +901,7 @@ export function extractMaterial(target, precise = true) {
       ctx.updateEditor();
       ctx.setDesignMode('brush', false);
     } else {
-      ctx.showToast(' Item');
+      ctx.showToast('No material picked from target.');
       ctx.setDesignMode('select');
     }
   } else {
@@ -1117,12 +1110,12 @@ export function extractMaterial(target, precise = true) {
     if (materialsArray.length > 0) {
       editor.activeMaterialArray = materialsArray;
       editor.activeMaterialDescriptor = null; //  
-      ctx.showToast(' Item， Item');
+      ctx.showToast('Material set copied. Click target to apply.');
       renderMaterialLibrary();
       ctx.updateEditor();
       ctx.setDesignMode('brush', false);
     } else {
-      ctx.showToast(' Item');
+      ctx.showToast('No materials found to copy.');
     }
   }
 }
@@ -1130,7 +1123,7 @@ export function extractMaterial(target, precise = true) {
 export function applyMaterial(target, designMode) {
   if (!target) return;
   if (isTargetLocked(target)) {
-    ctx.showToast(' ItemLock');
+    ctx.showToast('Target is locked.');
     return;
   }
 
@@ -1139,7 +1132,7 @@ export function applyMaterial(target, designMode) {
   const activeMaterialArray = editor.activeMaterialArray;
 
   if (!isArrayMode && !activeMaterialDescriptor) {
-    ctx.showToast(' ItemSelect ItemPick Material Item');
+    ctx.showToast('Please select or pick a material first.');
     return;
   }
 
@@ -1330,12 +1323,12 @@ export function applyMaterial(target, designMode) {
         }
         if (componentId) {
           if (isTargetLocked({ type: 'item', id: target.id })) {
-            ctx.showToast(' ItemLock');
+            ctx.showToast('Target is locked.');
             return;
           }
           ctx.entityManager.updateItemComponentMaterial(target.id, componentId, activeMaterialDescriptor);
         } else {
-          ctx.showToast(' ItemFurniture Item');
+          ctx.showToast('No component found on selected furniture.');
         }
       } else if (target.type === 'fence') {
         const componentId = target.pick ? findMetadataFromNode(target.pick.pickedMesh, 'blueprintFenceComponentId') : null;
@@ -1398,7 +1391,7 @@ export function applyMaterial(target, designMode) {
         ctx.updateEditor();
         ctx.renderPlan();
       } else {
-        ctx.showToast(' ItemSelect Item');
+        ctx.showToast('Please select a material first.');
       }
     } else if (target.type === 'wall') {
       const wall = ctx.testMap.getEntity('wall', target.id);
@@ -1437,10 +1430,10 @@ export function applyMaterial(target, designMode) {
 
       const room = ctx.testMap.getRoomAt(checkX, checkZ);
       if (!room) {
-        //  Room（ ）， 
+        // Standalone wall material application
         ctx.pushHistory();
         ctx.testMap.updateWall(wall.id, buildWallSurfacePatch(side, component, srcWallMaterial, srcWallColor));
-        ctx.showToast(' Item（ Item）');
+        ctx.showToast('Applied material to wall surface.');
         ctx.refreshShadows();
         ctx.updateEditor();
         ctx.renderPlan();
@@ -1490,7 +1483,7 @@ export function applyMaterial(target, designMode) {
         }
       });
 
-      ctx.showToast(` ItemRoom Item ${count}  Item`);
+      ctx.showToast(`Applied material to ${count} walls in room.`);
       ctx.refreshShadows();
       ctx.updateEditor();
       ctx.renderPlan();
@@ -1516,9 +1509,9 @@ export function applyMaterial(target, designMode) {
         });
 
         if (currentRoomId) {
-          ctx.showToast(` ItemFurniture ItemRoom Item ${count}  ItemFurniture Item`);
+          ctx.showToast(`Applied material to ${count} matching items in room.`);
         } else {
-          ctx.showToast(` ItemFurniture Item ${count}  ItemFurniture Item`);
+          ctx.showToast(`Applied material to ${count} matching items.`);
         }
         ctx.refreshShadows();
         ctx.updateEditor();
@@ -1566,9 +1559,9 @@ export function applyMaterial(target, designMode) {
         });
 
         if (fenceRoomId) {
-          ctx.showToast(` ItemRoom Item ${count}  Item`);
+          ctx.showToast(`Applied material to ${count} fences in room.`);
         } else {
-          ctx.showToast(` Item ${count}  Item`);
+          ctx.showToast(`Applied material to ${count} fences.`);
         }
         ctx.refreshShadows();
         ctx.updateEditor();
@@ -1614,9 +1607,9 @@ export function applyMaterial(target, designMode) {
         });
 
         if (gateRoomId) {
-          ctx.showToast(` ItemRoom Item ${count}  Item`);
+          ctx.showToast(`Applied material to ${count} fence gates in room.`);
         } else {
-          ctx.showToast(` Item ${count}  Item`);
+          ctx.showToast(`Applied material to ${count} fence gates.`);
         }
         ctx.refreshShadows();
         ctx.updateEditor();
@@ -1690,9 +1683,9 @@ export function applyMaterial(target, designMode) {
         });
 
         if (opRoomId) {
-          ctx.showToast(` ItemRoom Item ${count}  Item`);
+          ctx.showToast(`Applied material to ${count} openings in room.`);
         } else {
-          ctx.showToast(` Item ${count}  Item`);
+          ctx.showToast(`Applied material to ${count} openings.`);
         }
         ctx.refreshShadows();
         ctx.updateEditor();
@@ -1735,9 +1728,9 @@ export function applyMaterial(target, designMode) {
         });
 
         if (roofRoomId) {
-          ctx.showToast(` ItemRoom Item ${count}  Item`);
+          ctx.showToast(`Applied material to ${count} roofs in room.`);
         } else {
-          ctx.showToast(` Item ${count}  Item`);
+          ctx.showToast(`Applied material to ${count} roofs.`);
         }
         ctx.refreshShadows();
         ctx.updateEditor();
@@ -1776,9 +1769,9 @@ export function applyMaterial(target, designMode) {
         });
 
         if (stairsRoomId) {
-          ctx.showToast(` ItemRoom Item ${count}  Item`);
+          ctx.showToast(`Applied material to ${count} stairs in room.`);
         } else {
-          ctx.showToast(` Item ${count}  Item`);
+          ctx.showToast(`Applied material to ${count} stairs.`);
         }
         ctx.refreshShadows();
         ctx.updateEditor();

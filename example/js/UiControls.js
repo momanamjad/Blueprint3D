@@ -165,7 +165,7 @@ export async function loadUploadedFurniture(file) {
   const source = await file.text();
   const definition = await registerCustomFurniture(source);
   Context.renderFurnitureGrid();
-  Context.showToast(`\u2713 \u5df2\u4e0a\u4f20\u5bb6\u5177\u201c${definition.name}\u201d`);
+  Context.showToast(`✓ Uploaded furniture "${definition.name}"`);
   saveCustomFurnitureToLocalStorage(definition.type, source);
 }
 
@@ -187,7 +187,7 @@ export function initFurnitureUpload() {
       await loadUploadedFurniture(file);
     } catch (error) {
       console.error('Furniture upload failed:', error);
-      await Context.showCustomAlert('\u4e0a\u4f20\u5bb6\u5177\u5931\u8d25', error?.message || '\u65e0\u6cd5\u8bfb\u53d6\u6b64\u5bb6\u5177\u6587\u4ef6\u3002');
+      await Context.showCustomAlert('Furniture Upload Failed', error?.message || 'Unable to read furniture file.');
     } finally {
       input.value = '';
     }
@@ -200,9 +200,9 @@ export function initFurnitureButtons() {
   const clearSearchBtn = document.getElementById('btn-clear-furniture-search');
   const groups = [
     { label: '', items: ['all', 'custom'] },
-    { label: ' ItemFurniture', items: ['tables', 'seating', 'storage', 'bedroom', 'kitchen', 'bathroom'] },
-    { label: ' ItemAppliances', items: ['appliances', 'lighting', 'decor', 'food', 'textiles', 'clothing', 'plants'] },
-    { label: ' ItemOutdoor', items: ['outdoor', 'landscape', 'flora'] }
+    { label: 'Furniture', items: ['tables', 'seating', 'storage', 'bedroom', 'kitchen', 'bathroom'] },
+    { label: 'Appliances & Decor', items: ['appliances', 'lighting', 'decor', 'food', 'textiles', 'clothing', 'plants'] },
+    { label: 'Outdoor & Garden', items: ['outdoor', 'landscape', 'flora'] }
   ];
 
   if (categorySelect && categorySelect.children.length === 0) {

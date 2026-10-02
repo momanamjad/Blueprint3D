@@ -19,7 +19,7 @@ test(' ： ', () => {
  { componentId: 'side', material: { name: 'Fluted Oak' } },
  { componentId: 'bottom', material: { name: 'Wall Panel Moulding' } }
  ];
- assert.equal(getActiveMaterialArrayDisplayName(matArray), 'Wall Panel Moulding、Fluted Oak');
+ assert.equal(getActiveMaterialArrayDisplayName(matArray), 'Wall Panel Moulding, Fluted Oak');
 });
 
 test(' ： #ffffff Sky / ', () => {

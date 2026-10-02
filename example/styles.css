@@ -2353,7 +2353,7 @@ kbd {
 }
 
 /* ==========================================
-   5  Item CSS
+   5. Settings Modal CSS
    ========================================== */
 .settings-modal-backdrop {
   z-index: 9999;
@@ -2787,7 +2787,7 @@ button.btn-range-reset:active {
 }
 
 /* ==========================================
-    Item（ Item， Item workspace  Item）
+   Mobile responsive layout overrides
    ========================================== */
 @media (max-width: 768px), (max-height: 520px) {
   .settings-modal-backdrop {
