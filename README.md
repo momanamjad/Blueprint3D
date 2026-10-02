@@ -18,7 +18,7 @@
 ## 🔗 Live Demo & Local Setup
 
 ### 🚀 Live Demo
-*   **Live Demo URL**:currently unavailable
+*   **Live Demo URL**: [https://momanamjad.github.io/Blueprint3D/](https://momanamjad.github.io/Blueprint3D/)
 *   *Provides full feature demonstrations including 2D drag-and-drop, 3D navigation, appliance toggle controls, material eyedropper & section painting, CAD/3MF drawing exports, and more.*
 
 ### 💻 Local Quickstart

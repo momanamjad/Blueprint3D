@@ -102,7 +102,7 @@ function copyFurnitureImagesPlugin() {
 export default defineConfig(({ command }) => ({
   plugins: [copyFurnitureImagesPlugin()],
   root: 'example',
-  base: command === 'serve' ? '/' : '/blueprint3d-babylon/example/',
+  base: command === 'serve' ? '/' : './',
   optimizeDeps: {
     include: [
       '@babylonjs/core',
